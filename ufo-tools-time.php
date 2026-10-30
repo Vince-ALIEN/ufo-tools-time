@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Ufo Tools Time
  * Description:       Bloc Gutenberg UFO Time : élément <time> stylisé avec point décoratif et séparateur (Tailwind CSS).
- * Requires at least: 6.1
+ * Requires at least: 6.6
  * Requires PHP:      7.4
  * Version:           1.0.0
  * Author:            UFO Agency
