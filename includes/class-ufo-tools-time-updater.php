@@ -165,9 +165,10 @@ final class Ufo_Tools_Time_Updater {
 		}
 
 		// Seul l'asset de ce dépôt est accepté comme paquet à installer.
-		$prefix  = 'https://github.com/' . self::REPO . '/releases/download/';
-		$package = '';
-		$assets  = isset( $data['assets'] ) ? (array) $data['assets'] : array();
+		$releases = 'https://github.com/' . self::REPO . '/releases';
+		$prefix   = $releases . '/download/';
+		$package  = '';
+		$assets   = isset( $data['assets'] ) ? (array) $data['assets'] : array();
 		foreach ( $assets as $asset ) {
 			$download = isset( $asset['browser_download_url'] ) ? (string) $asset['browser_download_url'] : '';
 			if ( isset( $asset['name'] ) && self::ASSET === $asset['name'] && 0 === strpos( $download, $prefix ) ) {
@@ -179,10 +180,16 @@ final class Ufo_Tools_Time_Updater {
 			return null;
 		}
 
+		// Page de la release, affichée dans la fiche : même dépôt exigé.
+		$url = isset( $data['html_url'] ) ? (string) $data['html_url'] : '';
+		if ( 0 !== strpos( $url, $releases . '/' ) ) {
+			$url = $releases;
+		}
+
 		return array(
 			'version'      => $version,
 			'package'      => $package,
-			'url'          => isset( $data['html_url'] ) ? (string) $data['html_url'] : 'https://github.com/' . self::REPO . '/releases',
+			'url'          => $url,
 			'body'         => trim( isset( $data['body'] ) ? (string) $data['body'] : '' ),
 			'published_at' => isset( $data['published_at'] ) ? (string) $data['published_at'] : '',
 		);
