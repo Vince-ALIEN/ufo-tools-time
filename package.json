@@ -1,6 +1,6 @@
 {
   "name": "ufo-tools-time",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Bloc Gutenberg UFO Time : élément <time> stylisé avec point décoratif et séparateur (Tailwind CSS).",
   "scripts": {
     "build": "wp-scripts build",

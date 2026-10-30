@@ -4,7 +4,7 @@ Tags: gutenberg, block, tailwind
 Requires at least: 6.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,6 +39,14 @@ Depuis les sources :
 Mettre à jour `Version` dans le fichier principal, `Stable tag`, `package.json` et le changelog ci-dessous, commiter, puis pousser le tag correspondant (`git tag v1.0.1 && git push origin v1.0.1`). Le workflow `Release` construit le zip et l'attache à la release GitHub.
 
 == Changelog ==
+
+= 1.0.1 =
+* Sécurité : « Vérifier à nouveau » ne contourne le cache des releases que pour un compte autorisé à mettre à jour les extensions.
+* Sécurité : le lien vers la page de la release doit pointer vers ce dépôt.
+* Sécurité : le zip est construit avec un jeton GitHub en lecture seule et sans scripts d'installation npm.
+* La désinstallation supprime le cache de la dernière release.
+* WordPress 6.6 minimum (le bloc ne se chargeait pas dans l'éditeur sur les versions antérieures).
+* Ajout du fichier LICENSE (GPL-2.0).
 
 = 1.0.0 =
 * Bloc `ufo-time` sorti d'Ufo Blocks 1.8.0 dans son propre plugin, sans changement de rendu.
