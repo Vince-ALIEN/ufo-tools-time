@@ -2,18 +2,22 @@
 # L'updater du plugin (includes/class-ufo-tools-time-updater.php) installe cet
 # asset ufo-tools-time.zip : build/ n'étant pas versionné, l'archive source de
 # GitHub ne serait pas installable.
+#
+# Deux jobs : la construction, qui exécute les dépendances npm, n'a qu'un
+# jeton en lecture ; seule la publication, sans npm, peut écrire.
 name: Release
 
 on:
   push:
     tags: ['v*']
 
-permissions:
-  contents: write
+permissions: {}
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -31,9 +35,11 @@ jobs:
             exit 1
           fi
 
+      # --ignore-scripts : aucun script d'installation des dépendances ne
+      # tourne avant la construction du zip livré aux sites.
       - name: Build et zip
         run: |
-          npm ci
+          npm ci --ignore-scripts
           npm run build
           npm run plugin-zip
 
@@ -41,12 +47,33 @@ jobs:
         run: |
           unzip -l ufo-tools-time.zip > files.txt
           grep -q ' ufo-tools-time/ufo-tools-time.php$' files.txt
+          grep -q ' ufo-tools-time/uninstall.php$' files.txt
           grep -q ' ufo-tools-time/includes/class-ufo-tools-time-updater.php$' files.txt
           grep -q ' ufo-tools-time/build/ufo-time/block.json$' files.txt
+
+      - name: Notes de release
+        run: awk '/^== Changelog ==/{c=1; next} c && /^= /{n++; next} c && n==1' readme.txt > notes.md
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release
+          path: |
+            ufo-tools-time.zip
+            notes.md
+          if-no-files-found: error
+          retention-days: 1
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release
 
       - name: Publication
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          awk '/^== Changelog ==/{c=1; next} c && /^= /{n++; next} c && n==1' readme.txt > notes.md
-          gh release create "$GITHUB_REF_NAME" ufo-tools-time.zip --title "$GITHUB_REF_NAME" --notes-file notes.md
+        run: gh release create "$GITHUB_REF_NAME" ufo-tools-time.zip --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --notes-file notes.md
